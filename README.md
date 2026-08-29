@@ -119,6 +119,21 @@ npm run tauri:build   # produce a distributable installer/executable
 Build output lands in `src-tauri/target/release/bundle/`. Tauri config lives in
 `src-tauri/tauri.conf.json` (window size, app identifier, icons).
 
+### Automated cross-platform releases
+
+`.github/workflows/release.yml` builds installers for **Windows, macOS (Intel +
+Apple Silicon), and Linux** and publishes them to a GitHub Release whenever you
+push a version tag:
+
+```bash
+# bump the version in package.json and src-tauri/tauri.conf.json first, then:
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The workflow creates a **draft** release with all platform installers attached —
+review it, then publish from the repo's Releases page.
+
 ## Notes
 
 - Phaser 4 ships its own TypeScript definitions, so no `@types/phaser` package
