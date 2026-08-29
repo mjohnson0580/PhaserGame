@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "PhaserGame",
-  "version": "0.1.0",
+  "version": "../package.json",
   "identifier": "io.github.mjohnson0580.phasergame",
   "build": {
     "frontendDist": "../dist",

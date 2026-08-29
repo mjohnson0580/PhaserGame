@@ -1,6 +1,7 @@
 # PhaserGame — Phaser 4 + Vite + TypeScript template
 
 [![Build](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml)
+[![Release](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml)
 
 A minimal, best-practice "Hello World" starter for [Phaser 4](https://phaser.io/)
 using [Vite](https://vite.dev/) and TypeScript. Clone/copy this folder as the
@@ -126,7 +127,8 @@ Apple Silicon), and Linux** and publishes them to a GitHub Release whenever you
 push a version tag:
 
 ```bash
-# bump the version in package.json and src-tauri/tauri.conf.json first, then:
+# bump "version" in package.json (the single source of truth — Tauri reads it
+# via "version": "../package.json" in tauri.conf.json), then tag and push:
 git tag v0.1.0
 git push origin v0.1.0
 ```
