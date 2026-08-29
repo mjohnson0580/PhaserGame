@@ -18,9 +18,10 @@ npm run setup   # rebrands the template to your game, then removes itself
 npm run dev
 ```
 
-`npm run setup` prompts for your game's name and automatically updates the
-package name, window title, Tauri app identifier, README, and the CI badge /
-GitHub Pages URLs — so you don't have to hand-edit them.
+`npm run setup` prompts for your game's name and author and automatically
+updates the package name, window title, Tauri app identifier, LICENSE, README,
+and the CI badge / GitHub Pages URLs — so you don't have to hand-edit them. It
+detects your repo from git, so the new URLs point at *your* GitHub repo.
 
 ## Stack
 
