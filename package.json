@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "keywords": [
     "phaser",
@@ -22,6 +25,7 @@
     "phaser": "^4.2.1"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"
   }

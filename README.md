@@ -78,6 +78,47 @@ this.load.image('logo', 'logo.png');
 
 Then use them in a scene: `this.add.image(400, 300, 'logo');`
 
+## Deploying the web build
+
+`npm run build` produces a folder of static files in `dist/` — no server
+runtime required, so it can be hosted anywhere (itch.io, Cloudflare Pages,
+Netlify, Vercel, S3, etc.). `vite.config.ts` uses `base: './'` so the build
+works from any path.
+
+### GitHub Pages (automated)
+
+`.github/workflows/deploy.yml` builds and deploys to GitHub Pages on every push
+to `main`. **One-time setup:** in the repo, go to **Settings → Pages → Build and
+deployment → Source** and select **"GitHub Actions"**. After the next push the
+game is live at `https://mjohnson0580.github.io/PhaserGame/`.
+
+## Desktop builds (Tauri)
+
+The game can be packaged as a small native executable (`.exe`/`.msi` on Windows,
+`.dmg` on macOS, AppImage/`.deb` on Linux) using [Tauri](https://tauri.app/),
+which wraps the web build in the OS's native webview.
+
+**Prerequisites (one-time):**
+
+1. Install the [Rust toolchain](https://rustup.rs/):
+   ```powershell
+   winget install --id Rustlang.Rustup
+   ```
+   (Restart the shell afterwards so `cargo` is on PATH.)
+2. Windows also needs the **Microsoft C++ Build Tools** and **WebView2** (the
+   latter ships with Windows 11). See the
+   [Tauri prerequisites](https://tauri.app/start/prerequisites/) for macOS/Linux.
+
+**Commands:**
+
+```bash
+npm run tauri:dev     # run the game in a native window with hot-reload
+npm run tauri:build   # produce a distributable installer/executable
+```
+
+Build output lands in `src-tauri/target/release/bundle/`. Tauri config lives in
+`src-tauri/tauri.conf.json` (window size, app identifier, icons).
+
 ## Notes
 
 - Phaser 4 ships its own TypeScript definitions, so no `@types/phaser` package
