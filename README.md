@@ -4,8 +4,8 @@
 [![Release](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml)
 
 A minimal, best-practice "Hello World" starter for [Phaser 4](https://phaser.io/)
-using [Vite](https://vite.dev/) and TypeScript. Clone/copy this folder as the
-starting point for new games.
+using [Vite](https://vite.dev/) and TypeScript — a GitHub template repository to
+spin up new games from.
 
 ## Start a new game from this template
 
