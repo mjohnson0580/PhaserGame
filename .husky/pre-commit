@@ -1,1 +1,5 @@
-npx lint-staged
+# Call lint-staged directly rather than via `npx`: husky already puts
+# node_modules/.bin on PATH, and npm's Unix `npx` script needs bash, which
+# some Git clients (GitHub Desktop) don't bundle — breaking commits from
+# those GUIs with "env: 'bash': No such file or directory".
+lint-staged
