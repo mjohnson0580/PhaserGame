@@ -133,6 +133,14 @@ The workflow creates a **draft** GitHub Release with all platform installers
 attached as assets. Find it under the repo's **Releases** tab, review the
 installers, then click **Publish release** to make it public.
 
+Each release also includes **portable, no-install** downloads: a raw
+`*_portable.exe` for Windows (runs standalone wherever the WebView2 runtime is
+present — always on Windows 11), plus the Linux **AppImage** and macOS **`.app`**
+(inside the `.dmg`), which are portable by nature. To build *only* portable
+artifacts and skip the installers, set `bundle.targets` in
+`src-tauri/tauri.conf.json` (e.g. `["app", "appimage"]`) or narrow the
+`args` in the release workflow.
+
 ### Local builds (optional — requires admin to set up)
 
 Building on your own machine is only needed if you want to run/debug the game in

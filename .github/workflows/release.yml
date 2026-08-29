@@ -93,7 +93,24 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'PhaserGame ${{ github.ref_name }}'
-          releaseBody: 'Download the installer for your platform from the assets below.'
+          releaseBody: 'Download the installer — or the portable .exe (Windows) / AppImage (Linux) — for your platform from the assets below.'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+      # Attach the raw compiled .exe as a portable, no-installer download.
+      # (Linux AppImage and the macOS .app are already portable.) The portable
+      # .exe runs standalone as long as the WebView2 runtime is present —
+      # bundled with Windows 11, evergreen on most Windows 10.
+      - name: Attach portable Windows executable
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $exe = Get-ChildItem -Path src-tauri/target/release -Filter *.exe -File |
+            Sort-Object Length -Descending | Select-Object -First 1
+          if (-not $exe) { throw "No portable .exe found in src-tauri/target/release" }
+          $portable = Join-Path $exe.DirectoryName "$($exe.BaseName)_${{ github.ref_name }}_portable.exe"
+          Copy-Item $exe.FullName $portable
+          gh release upload "${{ github.ref_name }}" "$portable" --clobber
