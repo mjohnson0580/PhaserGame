@@ -87,7 +87,9 @@ fuller canvas fake. Tests run in CI via `.github/workflows/build.yml`.
 
 Code style is enforced with [Prettier](https://prettier.io/). Config lives in
 [`.prettierrc.json`](.prettierrc.json) (single quotes, no trailing commas, 100-char
-width).
+width). An [`.editorconfig`](.editorconfig) applies the same indent/charset/EOL
+rules in your editor as you type — most editors read it natively (VS Code needs
+the [EditorConfig extension](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)).
 
 ```bash
 npm run format         # format everything in place
