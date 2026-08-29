@@ -1,0 +1,3 @@
+# Put game assets (images, audio, spritesheets, tilemaps) in this folder.
+# Anything under public/ is copied to the build root as-is, so load them
+# with paths relative to the site root, e.g. this.load.image('logo', 'assets/logo.png').

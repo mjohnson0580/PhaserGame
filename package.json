@@ -1,0 +1,28 @@
+{
+  "name": "phasergame",
+  "version": "1.0.0",
+  "description": "Phaser 4 + Vite + TypeScript base template (Hello World)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "phaser",
+    "phaser4",
+    "vite",
+    "typescript",
+    "template",
+    "game"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  }
+}
