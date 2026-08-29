@@ -187,7 +187,15 @@ async function main() {
     console.log('  removed scripts/setup.mjs');
   }
 
-  console.log(`\n  Done! Next steps:\n    npm run dev        # start building your game\n`);
+  // The icon is the one piece of branding this script can't rewrite — it's
+  // artwork, not text — so call it out explicitly instead of leaving the
+  // placeholder to ship unnoticed.
+  console.log(`
+  Done! Next steps:
+    1. Replace public/favicon.svg with your game's icon
+    2. npm run icons   # regenerate the desktop/installer icons from it
+    3. npm run dev     # start building your game
+`);
   rl.close();
 }
 

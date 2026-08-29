@@ -17,6 +17,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "tauri": "tauri",
+    "icons": "tauri icon public/favicon.svg",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
   },

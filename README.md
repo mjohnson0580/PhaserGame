@@ -60,6 +60,7 @@ fly, hot-reloads on save, and serves working source maps for debugging.
 | `npm run test:coverage` | Run tests once and write a coverage report.        |
 | `npm run format`        | Format the whole project with Prettier.            |
 | `npm run format:check`  | Check formatting without writing (used in CI).     |
+| `npm run icons`         | Regenerate app icons from `public/favicon.svg`.    |
 
 ## Testing
 
@@ -182,7 +183,7 @@ PhaserGame/
 │   └── setup.mjs         # One-time rebrand (`npm run setup`); deletes itself
 ├── src-tauri/            # Desktop app shell — Rust + Tauri config and icons
 ├── public/               # Copied to the build root as-is
-│   ├── favicon.svg       # Browser tab icon
+│   ├── favicon.svg       # Browser tab icon + source for the app icons
 │   └── assets/           # Images, audio, spritesheets — load in Preloader.ts
 ├── test/
 │   └── setup.ts          # Vitest setup — stubs the canvas context jsdom lacks
@@ -223,6 +224,38 @@ to `main`, running the same format / test / type-check gates as CI first so a
 commit that compiles but fails its tests never reaches production. **One-time setup:** in the repo, go to **Settings → Pages → Build and
 deployment → Source** and select **"GitHub Actions"**. After the next push the
 game is live at `https://mjohnson0580.github.io/PhaserGame/`.
+
+## App icon
+
+One source image drives every icon: [`public/favicon.svg`](public/favicon.svg)
+is the browser tab icon, and the desktop app's icons are generated from it.
+Replace that file with your own art, then run:
+
+```bash
+npm run icons
+```
+
+This rewrites `src-tauri/icons/` — the Windows `.ico`, macOS `.icns`, Microsoft
+Store logos, and the PNGs referenced by `bundle.icon` in
+[`src-tauri/tauri.conf.json`](src-tauri/tauri.conf.json). It also emits Android
+and iOS icon sets; those aren't committed here because the template doesn't build
+for mobile yet, but re-running the command produces them if you add those
+targets.
+
+A few things to know about the source art:
+
+- **Design it square, and check it small.** It's rendered everywhere from a 16px
+  browser tab to a 1024px installer, so a simple, high-contrast mark survives far
+  better than a detailed illustration.
+- **Use transparency** where you want the canvas to show through — the generator
+  preserves the alpha channel.
+- **macOS is a partial exception.** `tauri icon` resizes but doesn't apply
+  macOS's rounded-square mask or the safe-area inset Apple's icon grid expects,
+  so a full-bleed design reads slightly larger than native apps in the Dock.
+  Fine for most games; if it matters, build the padding into your source art.
+
+The icon shipped with the template is a deliberately plain placeholder matching
+the game's palette — replace it before you release.
 
 ## Desktop builds (Tauri)
 
