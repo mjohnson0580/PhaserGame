@@ -49,6 +49,37 @@ fly, hot-reloads on save, and serves working source maps for debugging.
 | `npm run build`     | Type-check, then bundle to `dist/`.                      |
 | `npm run preview`   | Serve the production `dist/` build locally.              |
 | `npm run typecheck` | Run the TypeScript type checker only.                    |
+| `npm run test`      | Run the Vitest suite once (used in CI).                  |
+| `npm run test:watch`| Re-run tests on change while developing.                 |
+
+## Testing
+
+Unit tests run on [Vitest](https://vitest.dev/), which reuses this project's
+Vite pipeline so tests transform TypeScript exactly like the app does.
+
+```bash
+npm run test         # run once
+npm run test:watch   # re-run on change
+```
+
+Test files use the `*.spec.ts` convention and live **alongside the code they
+cover**. Phaser scenes want a real canvas/WebGL context, which headless test
+runners don't have, so the template uses a **two-layer** strategy:
+
+1. **Pure logic (most of your tests).** Keep game rules — scoring, movement,
+   state — in plain functions/classes with no Phaser imports, and test them
+   directly. See [`src/utils/math.ts`](src/utils/math.ts) and its spec. These are
+   fast and rock-solid.
+2. **Scene wiring (a thin layer).** Construct a scene and inject fake Phaser
+   systems (`add`, `tweens`, `input`, …) to assert `create()` builds the right
+   objects, without booting a real game. See
+   [`src/scenes/MainScene.spec.ts`](src/scenes/MainScene.spec.ts).
+
+[`test/setup.ts`](test/setup.ts) stubs the canvas 2D context jsdom lacks, so
+`import Phaser from 'phaser'` doesn't throw. To boot an actual `Phaser.Game` in a
+test, use the `Phaser.HEADLESS` renderer and add
+[`vitest-canvas-mock`](https://www.npmjs.com/package/vitest-canvas-mock) for a
+fuller canvas fake. Tests run in CI via `.github/workflows/build.yml`.
 
 ## Using the "Live Server" VS Code extension
 
@@ -76,12 +107,19 @@ PhaserGame/
 ├── tsconfig.json         # Strict TypeScript config (type-check only)
 ├── public/
 │   └── assets/           # Static assets — copied to build root as-is
+├── test/
+│   └── setup.ts          # Vitest setup — stubs the canvas context jsdom lacks
+├── vitest.config.ts      # Vitest config (jsdom, reuses Vite pipeline)
 └── src/
     ├── main.ts           # Game config + entry point
+    ├── utils/
+    │   ├── math.ts       # Pure, testable game math helpers
+    │   └── math.spec.ts  # Co-located unit tests
     └── scenes/
-        ├── Boot.ts       # Boots first; loads assets for the Preloader
-        ├── Preloader.ts  # Loads game assets with a progress bar
-        └── MainScene.ts  # Hello World gameplay — replace this
+        ├── Boot.ts          # Boots first; loads assets for the Preloader
+        ├── Preloader.ts     # Loads game assets with a progress bar
+        ├── MainScene.ts     # Hello World gameplay — replace this
+        └── MainScene.spec.ts # Scene-wiring test (fake Phaser systems)
 ```
 
 ## Adding assets
