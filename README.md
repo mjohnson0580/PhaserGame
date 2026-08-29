@@ -160,6 +160,49 @@ npm run tauri:build   # produce a distributable installer/executable
 Build output lands in `src-tauri/target/release/bundle/`. Tauri config lives in
 `src-tauri/tauri.conf.json` (window size, app identifier, icons).
 
+### Code signing
+
+Unsigned installers trigger a warning on end users' machines — **"Windows
+protected your PC / Unknown publisher"** (SmartScreen) on Windows, and
+**"unidentified developer"** (Gatekeeper) on macOS. This is expected for an
+unsigned build; while testing, choose **More info → Run anyway** on Windows or
+right-click → **Open** on macOS. To remove the warning for everyone else, sign
+the installers.
+
+**Windows** — options, cheapest first:
+
+| Option | Cost | SmartScreen reputation |
+| --- | --- | --- |
+| [Azure Trusted Signing](https://learn.microsoft.com/azure/trusted-signing/) | ~$10/mo | Good, builds quickly |
+| OV certificate | ~$100–400/yr | Accrues over time |
+| EV certificate | ~$300–700/yr | Instant (needs a hardware token) |
+
+To enable **Azure Trusted Signing** (recommended) in the release workflow:
+
+1. Set up a Trusted Signing account + certificate profile in Azure, and add
+   `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` as repository
+   secrets (Settings → Secrets and variables → Actions).
+2. Uncomment the "Install Windows signing tool" step and the `AZURE_*` env lines
+   in `.github/workflows/release.yml`.
+3. Add a `signCommand` to the `bundle` block of `src-tauri/tauri.conf.json`
+   (this file is strict JSON and can't hold comments, so the snippet lives here —
+   replace the endpoint region, account, and certificate profile):
+
+   ```jsonc
+   "bundle": {
+     "windows": {
+       "signCommand": "trusted-signing-cli -e https://eus.codesigning.azure.net -a MyAccount -c MyCertProfile %1"
+     }
+   }
+   ```
+
+**macOS** — signing + notarization needs an [Apple Developer account](https://developer.apple.com/)
+($99/yr). Add `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`,
+`APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, and `APPLE_TEAM_ID` as
+repository secrets, then uncomment the matching `APPLE_*` env lines in the
+release workflow. See the
+[Tauri macOS signing guide](https://tauri.app/distribute/sign/macos/).
+
 ## Notes
 
 - Phaser 4 ships its own TypeScript definitions, so no `@types/phaser` package

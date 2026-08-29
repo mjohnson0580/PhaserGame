@@ -63,10 +63,33 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      # --- Windows code signing via Azure Trusted Signing (optional) ---
+      # To enable:
+      #   1. Set up Azure Trusted Signing and create repo secrets
+      #      AZURE_CLIENT_ID / AZURE_CLIENT_SECRET / AZURE_TENANT_ID
+      #      (Settings > Secrets and variables > Actions).
+      #   2. Uncomment this step and the AZURE_* env lines below.
+      #   3. Add a "signCommand" to src-tauri/tauri.conf.json's bundle.windows
+      #      block (see the "Code signing" section in the README).
+      # - name: Install Windows signing tool
+      #   if: matrix.platform == 'windows-latest'
+      #   run: cargo install trusted-signing-cli
+
       - name: Build and publish release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Windows — Azure Trusted Signing credentials (see step above):
+          # AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          # AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          # AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          # macOS — Apple signing + notarization (see README "Code signing"):
+          # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'PhaserGame ${{ github.ref_name }}'
