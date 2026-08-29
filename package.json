@@ -1,6 +1,6 @@
 {
   "name": "phasergame",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Phaser 4 + Vite + TypeScript base template (Hello World)",
   "type": "module",
   "scripts": {
