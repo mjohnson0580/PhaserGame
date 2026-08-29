@@ -4,6 +4,7 @@
   "description": "Phaser 4 + Vite + TypeScript base template (Hello World)",
   "type": "module",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",

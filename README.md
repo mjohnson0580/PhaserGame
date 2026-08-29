@@ -7,6 +7,21 @@ A minimal, best-practice "Hello World" starter for [Phaser 4](https://phaser.io/
 using [Vite](https://vite.dev/) and TypeScript. Clone/copy this folder as the
 starting point for new games.
 
+## Start a new game from this template
+
+Click **"Use this template"** on GitHub to create a new repository, clone it,
+then run:
+
+```bash
+npm install
+npm run setup   # rebrands the template to your game, then removes itself
+npm run dev
+```
+
+`npm run setup` prompts for your game's name and automatically updates the
+package name, window title, Tauri app identifier, README, and the CI badge /
+GitHub Pages URLs — so you don't have to hand-edit them.
+
 ## Stack
 
 | Tool       | Version | Purpose                          |
