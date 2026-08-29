@@ -115,6 +115,30 @@ The game can be packaged as a small native executable (`.exe`/`.msi` on Windows,
 `.dmg` on macOS, AppImage/`.deb` on Linux) using [Tauri](https://tauri.app/),
 which wraps the web build in the OS's native webview.
 
+### Cloud releases (recommended — no local tools, no admin)
+
+`.github/workflows/release.yml` builds installers for **Windows, macOS (Intel +
+Apple Silicon), and Linux** on GitHub's runners and publishes them to a GitHub
+Release whenever you push a version tag — no Rust, C++ toolchain, or admin
+rights needed on your machine:
+
+```bash
+# bump "version" in package.json (the single source of truth — Tauri reads it
+# via "version": "../package.json" in tauri.conf.json), then tag and push:
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The workflow creates a **draft** GitHub Release with all platform installers
+attached as assets. Find it under the repo's **Releases** tab, review the
+installers, then click **Publish release** to make it public.
+
+### Local builds (optional — requires admin to set up)
+
+Building on your own machine is only needed if you want to run/debug the game in
+a native window. It requires a C++ toolchain, which needs administrator rights
+to install — if you don't have admin, use the cloud releases above instead.
+
 **Prerequisites (one-time):**
 
 1. Install the [Rust toolchain](https://rustup.rs/):
@@ -122,8 +146,8 @@ which wraps the web build in the OS's native webview.
    winget install --id Rustlang.Rustup
    ```
    (Restart the shell afterwards so `cargo` is on PATH.)
-2. Windows also needs the **Microsoft C++ Build Tools** and **WebView2** (the
-   latter ships with Windows 11). See the
+2. Windows also needs the **Microsoft C++ Build Tools** (admin install) and
+   **WebView2** (ships with Windows 11). See the
    [Tauri prerequisites](https://tauri.app/start/prerequisites/) for macOS/Linux.
 
 **Commands:**
@@ -135,22 +159,6 @@ npm run tauri:build   # produce a distributable installer/executable
 
 Build output lands in `src-tauri/target/release/bundle/`. Tauri config lives in
 `src-tauri/tauri.conf.json` (window size, app identifier, icons).
-
-### Automated cross-platform releases
-
-`.github/workflows/release.yml` builds installers for **Windows, macOS (Intel +
-Apple Silicon), and Linux** and publishes them to a GitHub Release whenever you
-push a version tag:
-
-```bash
-# bump "version" in package.json (the single source of truth — Tauri reads it
-# via "version": "../package.json" in tauri.conf.json), then tag and push:
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-The workflow creates a **draft** release with all platform installers attached —
-review it, then publish from the repo's Releases page.
 
 ## Notes
 
