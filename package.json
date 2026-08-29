@@ -4,6 +4,7 @@
   "description": "Phaser 4 + Vite + TypeScript base template (Hello World)",
   "type": "module",
   "scripts": {
+    "prepare": "husky",
     "setup": "node scripts/setup.mjs",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -12,11 +13,15 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,cjs,json,jsonc,html,css,md,yml,yaml}": "prettier --write"
   },
   "keywords": [
     "phaser",
@@ -27,13 +32,19 @@
     "game"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "phaser": "^4.2.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.4",
+    "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
+    "husky": "^9.1.7",
     "jsdom": "^30.0.1",
+    "lint-staged": "^17.4.1",
     "prettier": "^3.9.6",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",

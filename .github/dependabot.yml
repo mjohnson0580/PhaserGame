@@ -1,0 +1,29 @@
+# Keeps the template's dependencies current so a game started from it doesn't
+# begin life months behind. https://docs.github.com/code-security/dependabot
+version: 2
+updates:
+  # npm — the game itself (Phaser, Vite, TypeScript, test/format tooling).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for the routine patch/minor churn; majors still come through
+      # individually so breaking changes get reviewed on their own.
+      dev-dependencies:
+        dependency-type: development
+        update-types: ['minor', 'patch']
+
+  # GitHub Actions used by the build / deploy / release workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # Rust crates behind the Tauri desktop builds.
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3

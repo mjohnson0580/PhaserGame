@@ -7,6 +7,9 @@ dist/
 # Vite cache
 .vite/
 
+# Test coverage output
+coverage/
+
 # Logs
 *.log
 npm-debug.log*

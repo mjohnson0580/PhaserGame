@@ -38,21 +38,28 @@ npm install       # install dependencies (run once)
 npm run dev       # start the Vite dev server at http://localhost:8080
 ```
 
+Node **22 or newer** is required (pinned in [`.nvmrc`](.nvmrc), which both CI and
+`nvm use` read). The dev server also listens on your LAN address — the terminal
+prints a `Network:` URL you can open on a phone on the same Wi-Fi to test touch
+input and real mobile performance.
+
 `npm run dev` is the **recommended** workflow: it compiles TypeScript on the
 fly, hot-reloads on save, and serves working source maps for debugging.
 
 ## Scripts
 
-| Script                 | What it does                                       |
-| ---------------------- | -------------------------------------------------- |
-| `npm run dev`          | Start Vite dev server with hot-reload (port 8080). |
-| `npm run build`        | Type-check, then bundle to `dist/`.                |
-| `npm run preview`      | Serve the production `dist/` build locally.        |
-| `npm run typecheck`    | Run the TypeScript type checker only.              |
-| `npm run test`         | Run the Vitest suite once (used in CI).            |
-| `npm run test:watch`   | Re-run tests on change while developing.           |
-| `npm run format`       | Format the whole project with Prettier.            |
-| `npm run format:check` | Check formatting without writing (used in CI).     |
+| Script                  | What it does                                       |
+| ----------------------- | -------------------------------------------------- |
+| `npm run dev`           | Start Vite dev server with hot-reload (port 8080). |
+| `npm run build`         | Type-check, then bundle to `dist/`.                |
+| `npm run preview`       | Serve the production `dist/` build locally.        |
+| `npm run typecheck`     | Run the TypeScript type checker only.              |
+| `npm run test`          | Run the Vitest suite once (used in CI).            |
+| `npm run test:watch`    | Re-run tests on change while developing.           |
+| `npm run test:ui`       | Run tests in Vitest's browser UI.                  |
+| `npm run test:coverage` | Run tests once and write a coverage report.        |
+| `npm run format`        | Format the whole project with Prettier.            |
+| `npm run format:check`  | Check formatting without writing (used in CI).     |
 
 ## Testing
 
@@ -83,6 +90,22 @@ test, use the `Phaser.HEADLESS` renderer and add
 [`vitest-canvas-mock`](https://www.npmjs.com/package/vitest-canvas-mock) for a
 fuller canvas fake. Tests run in CI via `.github/workflows/build.yml`.
 
+### Coverage
+
+```bash
+npm run test:coverage
+```
+
+Prints a summary in the terminal and writes a browsable HTML report to
+`coverage/index.html` (plus `lcov.info` for editor extensions and CI services).
+Coverage is measured across **all** of `src/` — not just files a test imports —
+so untested modules show up as 0% rather than silently disappearing. `main.ts`
+is excluded, since it only constructs the game.
+
+> The terminal table lists only files with **less than** 100% coverage — a file
+> missing from it is fully covered, not untested (it still counts toward the
+> totals). The HTML report lists every file.
+
 ## Formatting
 
 Code style is enforced with [Prettier](https://prettier.io/). Config lives in
@@ -104,6 +127,21 @@ npm run format:check   # verify formatting (fails if anything is off — runs in
 > Prettier don't overlap. In the meantime, `tsc`'s strict settings
 > ([`tsconfig.json`](tsconfig.json)) catch most correctness issues.
 
+### Pre-commit hook
+
+A [husky](https://typicode.github.io/husky/) `pre-commit` hook runs
+[lint-staged](https://github.com/lint-staged/lint-staged), which formats **only
+the files you're committing** with Prettier and re-stages them. CI checks
+formatting on every push, so this catches the problem at commit time instead of
+after a failed build. The hook installs itself via the `prepare` script when you
+run `npm install` — no extra setup.
+
+To bypass it for a single commit (it won't be formatted, and CI will say so):
+
+```bash
+git commit --no-verify -m "wip"
+```
+
 ## Using the "Live Server" VS Code extension
 
 Live Server serves **static files** — it does not compile TypeScript. So build
@@ -118,8 +156,10 @@ Then right-click **`dist/index.html`** → **"Open with Live Server"**. Because
 runs correctly under Live Server.
 
 > For day-to-day development, `npm run dev` is smoother (instant hot-reload, no
-> rebuild step). Use Live Server when you specifically want to debug the
-> production build.
+> rebuild step) and it's the only mode with source maps — the production build
+> ships without them (see `build.sourcemap` in
+> [`vite.config.ts`](vite.config.ts)), so stack traces there point at minified
+> code. Flip `sourcemap` to `true` if you need to debug the built bundle.
 
 ## Project structure
 
@@ -127,12 +167,25 @@ runs correctly under Live Server.
 PhaserGame/
 ├── index.html            # Page host for the game canvas
 ├── vite.config.ts        # Vite + build config (relative base, phaser chunk)
+├── vitest.config.ts      # Vitest config (jsdom, reuses Vite pipeline, coverage)
 ├── tsconfig.json         # Strict TypeScript config (type-check only)
-├── public/
-│   └── assets/           # Static assets — copied to build root as-is
+├── .nvmrc                # Node version, read by CI and `nvm use`
+├── .husky/
+│   └── pre-commit        # Formats staged files with Prettier before committing
+├── .github/
+│   ├── dependabot.yml    # Weekly npm / Actions / Cargo update PRs
+│   └── workflows/
+│       ├── build.yml     # CI: format, test, type-check, build
+│       ├── deploy.yml    # Publishes the web build to GitHub Pages
+│       └── release.yml   # Builds native installers on a version tag
+├── scripts/
+│   └── setup.mjs         # One-time rebrand (`npm run setup`); deletes itself
+├── src-tauri/            # Desktop app shell — Rust + Tauri config and icons
+├── public/               # Copied to the build root as-is
+│   ├── favicon.svg       # Browser tab icon
+│   └── assets/           # Images, audio, spritesheets — load in Preloader.ts
 ├── test/
 │   └── setup.ts          # Vitest setup — stubs the canvas context jsdom lacks
-├── vitest.config.ts      # Vitest config (jsdom, reuses Vite pipeline)
 └── src/
     ├── main.ts           # Game config + entry point
     ├── utils/
@@ -166,7 +219,8 @@ works from any path.
 ### GitHub Pages (automated)
 
 `.github/workflows/deploy.yml` builds and deploys to GitHub Pages on every push
-to `main`. **One-time setup:** in the repo, go to **Settings → Pages → Build and
+to `main`, running the same format / test / type-check gates as CI first so a
+commit that compiles but fails its tests never reaches production. **One-time setup:** in the repo, go to **Settings → Pages → Build and
 deployment → Source** and select **"GitHub Actions"**. After the next push the
 game is live at `https://mjohnson0580.github.io/PhaserGame/`.
 
@@ -271,6 +325,14 @@ To enable **Azure Trusted Signing** (recommended) in the release workflow:
 repository secrets, then uncomment the matching `APPLE_*` env lines in the
 release workflow. See the
 [Tauri macOS signing guide](https://tauri.app/distribute/sign/macos/).
+
+## Dependency updates
+
+[`.github/dependabot.yml`](.github/dependabot.yml) opens weekly PRs for npm
+packages, GitHub Actions, and the Rust crates behind the Tauri build. Routine
+dev-dependency patches are grouped into a single PR; major bumps arrive
+separately so breaking changes get reviewed on their own. CI runs on each PR, so
+a green check means the update is safe to merge.
 
 ## Notes
 
