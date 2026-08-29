@@ -1,5 +1,7 @@
 # PhaserGame — Phaser 4 + Vite + TypeScript template
 
+[![Build](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml)
+
 A minimal, best-practice "Hello World" starter for [Phaser 4](https://phaser.io/)
 using [Vite](https://vite.dev/) and TypeScript. Clone/copy this folder as the
 starting point for new games.
