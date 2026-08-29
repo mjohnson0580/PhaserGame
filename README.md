@@ -21,15 +21,15 @@ npm run dev
 `npm run setup` prompts for your game's name and author and automatically
 updates the package name, window title, Tauri app identifier, LICENSE, README,
 and the CI badge / GitHub Pages URLs — so you don't have to hand-edit them. It
-detects your repo from git, so the new URLs point at *your* GitHub repo.
+detects your repo from git, so the new URLs point at _your_ GitHub repo.
 
 ## Stack
 
-| Tool       | Version | Purpose                          |
-| ---------- | ------- | -------------------------------- |
+| Tool       | Version | Purpose                           |
+| ---------- | ------- | --------------------------------- |
 | Phaser     | ^4.2.1  | Game framework (bundled TS types) |
-| Vite       | ^8.x    | Dev server + bundler             |
-| TypeScript | ^7.x    | Type checking                    |
+| Vite       | ^8.x    | Dev server + bundler              |
+| TypeScript | ^7.x    | Type checking                     |
 
 ## Getting started
 
@@ -43,14 +43,16 @@ fly, hot-reloads on save, and serves working source maps for debugging.
 
 ## Scripts
 
-| Script              | What it does                                              |
-| ------------------- | -------------------------------------------------------- |
-| `npm run dev`       | Start Vite dev server with hot-reload (port 8080).       |
-| `npm run build`     | Type-check, then bundle to `dist/`.                      |
-| `npm run preview`   | Serve the production `dist/` build locally.              |
-| `npm run typecheck` | Run the TypeScript type checker only.                    |
-| `npm run test`      | Run the Vitest suite once (used in CI).                  |
-| `npm run test:watch`| Re-run tests on change while developing.                 |
+| Script                 | What it does                                       |
+| ---------------------- | -------------------------------------------------- |
+| `npm run dev`          | Start Vite dev server with hot-reload (port 8080). |
+| `npm run build`        | Type-check, then bundle to `dist/`.                |
+| `npm run preview`      | Serve the production `dist/` build locally.        |
+| `npm run typecheck`    | Run the TypeScript type checker only.              |
+| `npm run test`         | Run the Vitest suite once (used in CI).            |
+| `npm run test:watch`   | Re-run tests on change while developing.           |
+| `npm run format`       | Format the whole project with Prettier.            |
+| `npm run format:check` | Check formatting without writing (used in CI).     |
 
 ## Testing
 
@@ -80,6 +82,25 @@ runners don't have, so the template uses a **two-layer** strategy:
 test, use the `Phaser.HEADLESS` renderer and add
 [`vitest-canvas-mock`](https://www.npmjs.com/package/vitest-canvas-mock) for a
 fuller canvas fake. Tests run in CI via `.github/workflows/build.yml`.
+
+## Formatting
+
+Code style is enforced with [Prettier](https://prettier.io/). Config lives in
+[`.prettierrc.json`](.prettierrc.json) (single quotes, no trailing commas, 100-char
+width).
+
+```bash
+npm run format         # format everything in place
+npm run format:check   # verify formatting (fails if anything is off — runs in CI)
+```
+
+> **Linting (ESLint):** not yet included. The standard TypeScript linter,
+> `typescript-eslint`, does not yet support **TypeScript 7** (this template's
+> compiler) and refuses to run against it —
+> [tracking issue](https://github.com/typescript-eslint/typescript-eslint/issues/10940).
+> Once TS 7 support ships, add ESLint with `eslint-config-prettier` so it and
+> Prettier don't overlap. In the meantime, `tsc`'s strict settings
+> ([`tsconfig.json`](tsconfig.json)) catch most correctness issues.
 
 ## Using the "Live Server" VS Code extension
 
@@ -174,7 +195,7 @@ installers, then click **Publish release** to make it public.
 Each release also includes **portable, no-install** downloads: a raw
 `*_portable.exe` for Windows (runs standalone wherever the WebView2 runtime is
 present — always on Windows 11), plus the Linux **AppImage** and macOS **`.app`**
-(inside the `.dmg`), which are portable by nature. To build *only* portable
+(inside the `.dmg`), which are portable by nature. To build _only_ portable
 artifacts and skip the installers, set `bundle.targets` in
 `src-tauri/tauri.conf.json` (e.g. `["app", "appimage"]`) or narrow the
 `args` in the release workflow.
@@ -217,11 +238,11 @@ the installers.
 
 **Windows** — options, cheapest first:
 
-| Option | Cost | SmartScreen reputation |
-| --- | --- | --- |
-| [Azure Trusted Signing](https://learn.microsoft.com/azure/trusted-signing/) | ~$10/mo | Good, builds quickly |
-| OV certificate | ~$100–400/yr | Accrues over time |
-| EV certificate | ~$300–700/yr | Instant (needs a hardware token) |
+| Option                                                                      | Cost         | SmartScreen reputation           |
+| --------------------------------------------------------------------------- | ------------ | -------------------------------- |
+| [Azure Trusted Signing](https://learn.microsoft.com/azure/trusted-signing/) | ~$10/mo      | Good, builds quickly             |
+| OV certificate                                                              | ~$100–400/yr | Accrues over time                |
+| EV certificate                                                              | ~$300–700/yr | Instant (needs a hardware token) |
 
 To enable **Azure Trusted Signing** (recommended) in the release workflow:
 

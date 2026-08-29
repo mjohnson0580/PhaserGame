@@ -166,9 +166,7 @@ async function main() {
     replaceAll(t, `releaseName: '${oldName} `, `releaseName: '${displayName} `)
   );
 
-  await edit('LICENSE', (t) =>
-    t.replace(/Copyright \(c\) .*/, `Copyright (c) ${year} ${author}`)
-  );
+  await edit('LICENSE', (t) => t.replace(/Copyright \(c\) .*/, `Copyright (c) ${year} ${author}`));
 
   await edit('README.md', (t) => {
     let out = t;
