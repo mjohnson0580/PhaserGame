@@ -3,6 +3,8 @@
 [![Build](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/build.yml)
 [![Release](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml/badge.svg)](https://github.com/mjohnson0580/PhaserGame/actions/workflows/release.yml)
 
+<!-- template-only:start -->
+
 A minimal, best-practice "Hello World" starter for [Phaser 4](https://phaser.io/)
 using [Vite](https://vite.dev/) and TypeScript — a GitHub template repository to
 spin up new games from.
@@ -22,6 +24,7 @@ npm run dev
 updates the package name, window title, Tauri app identifier, LICENSE, README,
 and the CI badge / GitHub Pages URLs — so you don't have to hand-edit them. It
 detects your repo from git, so the new URLs point at _your_ GitHub repo.
+<!-- template-only:end -->
 
 ## Stack
 

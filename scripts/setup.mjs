@@ -3,7 +3,9 @@
  * Interactive project setup for the Phaser 4 + Vite + TypeScript template.
  *
  * Rebrands the template to your new game by rewriting the name, window title,
- * Tauri app identifier, LICENSE author, README, and CI badge / Pages URLs.
+ * Tauri app identifier, LICENSE author, README, and CI badge / Pages URLs. It
+ * also strips the parts of the README that only make sense while the project
+ * *is* a template — the "Use this template" pitch and these setup instructions.
  * Run once:
  *
  *   npm run setup
@@ -82,6 +84,18 @@ const ask = async (q, def) => {
   return a || def || '';
 };
 
+const isYes = (a) => /^y(es)?$/i.test(a);
+
+/**
+ * Prose that only makes sense while this project *is* a template — the pitch,
+ * the "Use this template" instructions — is fenced off in the README with HTML
+ * comment markers, so it can be lifted out wholesale here instead of being
+ * chased down with fragile phrase-by-phrase regexes. The markers are invisible
+ * in rendered Markdown, so they cost the template's own readers nothing.
+ */
+const TEMPLATE_BLOCK =
+  /[ \t]*<!--\s*template-only:start\s*-->[\s\S]*?<!--\s*template-only:end\s*-->[ \t]*\n{0,2}/g;
+
 async function main() {
   console.log('\n  Phaser 4 template setup\n  -----------------------\n');
 
@@ -108,6 +122,10 @@ async function main() {
   const owner = await ask('GitHub owner / username', guess.owner || oldOwner);
   const repo = await ask('GitHub repository name', guess.repo || slugify(displayName));
   const author = await ask('Author name (for LICENSE)', sh('git config user.name') || owner);
+  // Asked up front rather than at the very end: the README's project-structure
+  // diagram lists this script, so the rebrand pass below needs to know whether
+  // the script is about to disappear.
+  const removeSelf = isYes(await ask('Remove this setup script afterwards? (Y/n)', 'Y'));
 
   const pkgName = slugify(displayName);
   const identifier = `io.github.${idSeg(owner || 'dev')}.${idSeg(displayName)}`;
@@ -118,6 +136,7 @@ async function main() {
   console.log(`    Package name : ${pkgName}`);
   console.log(`    App id       : ${identifier}`);
   console.log(`    GitHub       : ${owner || '(none)'}/${repo}`);
+  console.log(`    Setup script : ${removeSelf ? 'deleted afterwards' : 'kept'}`);
   console.log(`    License      : (c) ${year} ${author}\n`);
 
   const ok = (await ask('Proceed? (Y/n)', 'Y')).toLowerCase();
@@ -148,6 +167,8 @@ async function main() {
     j.name = pkgName;
     j.version = '0.1.0';
     j.description = `${displayName} - a Phaser 4 game`;
+    // It's a game now, not a template you start games from.
+    if (Array.isArray(j.keywords)) j.keywords = j.keywords.filter((k) => k !== 'template');
     return j;
   });
 
@@ -170,15 +191,40 @@ async function main() {
 
   await edit('README.md', (t) => {
     let out = t;
+    const hadIntro = out.includes('template-only:start');
+    out = out.replace(TEMPLATE_BLOCK, '');
+
+    // The H1 carries the template's own tagline ("— Phaser 4 + Vite +
+    // TypeScript template"). Your game just wants its name.
+    out = out.replace(/^#[ \t]+.*$/m, `# ${displayName}`);
+
+    // ...and a one-line description of its own, dropped in where the pitch was.
+    if (hadIntro) {
+      out = out.replace(
+        /\n(## )/,
+        `\n${displayName} — a game built with [Phaser 4](https://phaser.io/), ` +
+          `[Vite](https://vite.dev/) and TypeScript.\n\n$1`
+      );
+    }
+
     out = replaceAll(out, `${oldOwner}/${oldRepo}`, `${owner}/${repo}`); // repo URLs
     out = replaceAll(out, `${oldOwner}.github.io/${oldRepo}`, `${owner}.github.io/${repo}`); // pages
     out = replaceAll(out, `${oldRepo}/`, `${repo}/`); // structure-diagram folder
-    out = replaceAll(out, oldName, displayName); // H1 + prose
+    out = replaceAll(out, oldName, displayName); // any stray mentions
+    out = replaceAll(out, oldSlug, pkgName);
+
+    // The sections worth keeping still refer to "the template" in passing.
+    out = out.replace(/\bthis template's\b/g, "this project's");
+    out = out.replace(/\bthe template\b/g, 'this project');
+
+    // The structure diagram lists the script we're about to delete.
+    if (removeSelf) {
+      out = out.replace(/^├── scripts\/\r?\n│[ \t]+└── setup\.mjs.*\r?\n/m, '');
+    }
     return out;
   });
 
-  const clean = (await ask('Remove this setup script now? (Y/n)', 'Y')).toLowerCase();
-  if (clean === 'y' || clean === 'yes') {
+  if (removeSelf) {
     await editJson('package.json', (j) => {
       delete j.scripts.setup;
       return j;
