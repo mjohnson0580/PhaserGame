@@ -1,6 +1,6 @@
 // Global test setup, loaded once by Vitest (see vitest.config.ts).
 //
-// jsdom implements the DOM but NOT canvas rendering contexts, so any code that
+// happy-dom implements the DOM but NOT canvas rendering contexts, so any code that
 // calls `canvas.getContext('2d' | 'webgl')` — including Phaser's renderers —
 // gets `null` and blows up. We stub a no-op 2D context so modules that touch a
 // canvas at import/boot time stay quiet in tests.

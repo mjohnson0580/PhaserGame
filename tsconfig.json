@@ -10,6 +10,7 @@
 
     /* Emit — Vite handles bundling, so tsc is type-check only */
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,

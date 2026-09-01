@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MainScene } from './MainScene';
 
-// Layer 2: scene wiring. Booting a full Phaser.Game in jsdom is flaky, so
+// Layer 2: scene wiring. Booting a full Phaser.Game in happy-dom is flaky, so
 // instead we construct the scene and inject fake Phaser systems (`add`,
 // `tweens`, `input`, `scale`). This verifies `create()` builds the right
 // objects and registers input WITHOUT rendering anything.

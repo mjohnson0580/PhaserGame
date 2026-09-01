@@ -88,7 +88,7 @@ runners don't have, so the template uses a **two-layer** strategy:
    objects, without booting a real game. See
    [`src/scenes/MainScene.spec.ts`](src/scenes/MainScene.spec.ts).
 
-[`test/setup.ts`](test/setup.ts) stubs the canvas 2D context jsdom lacks, so
+[`test/setup.ts`](test/setup.ts) stubs the canvas 2D context happy-dom lacks, so
 `import Phaser from 'phaser'` doesn't throw. To boot an actual `Phaser.Game` in a
 test, use the `Phaser.HEADLESS` renderer and add
 [`vitest-canvas-mock`](https://www.npmjs.com/package/vitest-canvas-mock) for a
@@ -171,7 +171,7 @@ runs correctly under Live Server.
 PhaserGame/
 ├── index.html            # Page host for the game canvas
 ├── vite.config.ts        # Vite + build config (relative base, phaser chunk)
-├── vitest.config.ts      # Vitest config (jsdom, reuses Vite pipeline, coverage)
+├── vitest.config.ts      # Vitest config (happy-dom, merges vite.config, coverage)
 ├── tsconfig.json         # Strict TypeScript config (type-check only)
 ├── .nvmrc                # Node version, read by CI and `nvm use`
 ├── .husky/
@@ -189,7 +189,7 @@ PhaserGame/
 │   ├── favicon.svg       # Browser tab icon + source for the app icons
 │   └── assets/           # Images, audio, spritesheets — load in Preloader.ts
 ├── test/
-│   └── setup.ts          # Vitest setup — stubs the canvas context jsdom lacks
+│   └── setup.ts          # Vitest setup — stubs the canvas context happy-dom lacks
 └── src/
     ├── main.ts           # Game config + entry point
     ├── utils/

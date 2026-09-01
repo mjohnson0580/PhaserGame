@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { clamp, wrap } from './math';
 
-// Layer 1: pure logic. No Phaser, no canvas, no jsdom needed — fast and stable.
+// Layer 1: pure logic. No Phaser, no canvas, no DOM needed — fast and stable.
 // This is where the bulk of your game's rules should be tested.
 
 describe('clamp', () => {
