@@ -61,6 +61,8 @@ fly, hot-reloads on save, and serves working source maps for debugging.
 | `npm run test:watch`    | Re-run tests on change while developing.           |
 | `npm run test:ui`       | Run tests in Vitest's browser UI.                  |
 | `npm run test:coverage` | Run tests once and write a coverage report.        |
+| `npm run test:e2e`      | Run the Playwright end-to-end tests.               |
+| `npm run test:e2e:ui`   | Run the end-to-end tests in Playwright's UI.       |
 | `npm run format`        | Format the whole project with Prettier.            |
 | `npm run format:check`  | Check formatting without writing (used in CI).     |
 | `npm run icons`         | Regenerate app icons from `public/favicon.svg`.    |
@@ -69,15 +71,17 @@ fly, hot-reloads on save, and serves working source maps for debugging.
 
 Unit tests run on [Vitest](https://vitest.dev/), which reuses this project's
 Vite pipeline so tests transform TypeScript exactly like the app does.
+End-to-end tests run on [Playwright](https://playwright.dev/).
 
 ```bash
-npm run test         # run once
-npm run test:watch   # re-run on change
+npm run test         # unit tests, run once
+npm run test:watch   # unit tests, re-run on change
+npm run test:e2e     # end-to-end tests in a real browser
 ```
 
 Test files use the `*.spec.ts` convention and live **alongside the code they
 cover**. Phaser scenes want a real canvas/WebGL context, which headless test
-runners don't have, so the template uses a **two-layer** strategy:
+runners don't have, so the template uses a **three-layer** strategy:
 
 1. **Pure logic (most of your tests).** Keep game rules — scoring, movement,
    state — in plain functions/classes with no Phaser imports, and test them
@@ -87,12 +91,48 @@ runners don't have, so the template uses a **two-layer** strategy:
    systems (`add`, `tweens`, `input`, …) to assert `create()` builds the right
    objects, without booting a real game. See
    [`src/scenes/MainScene.spec.ts`](src/scenes/MainScene.spec.ts).
+3. **End-to-end (thinnest of all).** Drive the real game in a real browser with
+   Playwright. This is the only layer where collision, physics and input behave
+   like they do for a player — and the slowest, so keep it to a handful of
+   journeys. See [`e2e/gameplay.spec.ts`](e2e/gameplay.spec.ts).
 
 [`test/setup.ts`](test/setup.ts) stubs the canvas 2D context happy-dom lacks, so
 `import Phaser from 'phaser'` doesn't throw. To boot an actual `Phaser.Game` in a
 test, use the `Phaser.HEADLESS` renderer and add
 [`vitest-canvas-mock`](https://www.npmjs.com/package/vitest-canvas-mock) for a
 fuller canvas fake. Tests run in CI via `.github/workflows/build.yml`.
+
+### End-to-end tests
+
+```bash
+npm run test:e2e      # headless, as CI runs them
+npm run test:e2e:ui   # interactive: step through, time-travel, inspect
+```
+
+Config lives in [`playwright.config.ts`](playwright.config.ts); specs live in
+[`e2e/`](e2e/) (kept out of `src/` so the two runners never collect each other's
+files). Playwright starts the dev server itself, so no separate `npm run dev` is
+needed. [`src/main.ts`](src/main.ts) exposes the running game as `window.game`
+**in dev builds only** — the guard compiles out of production bundles — which is
+what lets a test read real game state instead of inspecting pixels.
+
+**The one thing worth knowing before you write more of these:** a game advances
+on `requestAnimationFrame`, so any assertion after an interaction races the
+render loop. That is what makes naive game E2E tests flaky, and no amount of
+`waitForTimeout` really fixes it. The specs here instead use Playwright's
+[clock API](https://playwright.dev/docs/clock) to freeze time and advance it
+deliberately, so "600ms of game time" means exactly that on every machine.
+
+Two traps that cost real debugging time here, both worth knowing up front:
+
+- **Don't hand-step Phaser's loop** (`game.loop.sleep()` + `loop.step()`) to get
+  determinism. Phaser's `TweenManager` reads `Date.now()` directly rather than
+  the delta the TimeStep passes down, so hand-stepping advances scene updates
+  while leaving every tween frozen. `page.clock` fakes `Date.now()` too, so the
+  whole engine moves together. (`game.loop.tick()` is worse — it reads
+  `performance.now()` itself, so a loop of ticks produces ~0ms deltas.)
+- **Don't assert on a boundary.** Advancing exactly the tween's duration is a
+  coin flip over whether the final frame completes it. Advance past it.
 
 ### Coverage
 
@@ -172,6 +212,7 @@ PhaserGame/
 ├── index.html            # Page host for the game canvas
 ├── vite.config.ts        # Vite + build config (relative base, phaser chunk)
 ├── vitest.config.ts      # Vitest config (happy-dom, merges vite.config, coverage)
+├── playwright.config.ts  # End-to-end config (Chromium, starts the dev server)
 ├── tsconfig.json         # Strict TypeScript config (type-check only)
 ├── .nvmrc                # Node version, read by CI and `nvm use`
 ├── .husky/
@@ -179,7 +220,7 @@ PhaserGame/
 ├── .github/
 │   ├── dependabot.yml    # Weekly npm / Actions / Cargo update PRs
 │   └── workflows/
-│       ├── build.yml     # CI: format, test, type-check, build
+│       ├── build.yml     # CI: format, test, type-check, build, e2e
 │       ├── deploy.yml    # Publishes the web build to GitHub Pages
 │       └── release.yml   # Builds native installers on a version tag
 ├── scripts/
@@ -190,6 +231,8 @@ PhaserGame/
 │   └── assets/           # Images, audio, spritesheets — load in Preloader.ts
 ├── test/
 │   └── setup.ts          # Vitest setup — stubs the canvas context happy-dom lacks
+├── e2e/
+│   └── gameplay.spec.ts  # End-to-end tests — real browser, real game
 └── src/
     ├── main.ts           # Game config + entry point
     ├── utils/

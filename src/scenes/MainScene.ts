@@ -8,6 +8,12 @@ import Phaser from 'phaser';
  * your actual gameplay.
  */
 export class MainScene extends Phaser.Scene {
+  /**
+   * The spinning box. Public so end-to-end tests can assert on it — exposing
+   * the state you want to verify beats trying to read it back out of pixels.
+   */
+  box!: Phaser.GameObjects.Rectangle;
+
   constructor() {
     super('MainScene');
   }
@@ -36,6 +42,7 @@ export class MainScene extends Phaser.Scene {
     // A simple sprite drawn from Graphics — no image asset needed.
     const box = this.add.rectangle(width / 2, height / 2 + 60, 120, 120, 0x4ade80);
     box.setStrokeStyle(4, 0xffffff);
+    this.box = box;
 
     // Gentle idle bob so something is always moving.
     this.tweens.add({

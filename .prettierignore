@@ -3,3 +3,5 @@ node_modules
 coverage
 src-tauri/target
 package-lock.json
+playwright-report
+test-results

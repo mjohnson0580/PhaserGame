@@ -22,4 +22,14 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 // Kick everything off.
-export default new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// Expose the running game so end-to-end tests can read real game state
+// (see `e2e/`). `import.meta.env.DEV` is statically replaced at build time, so
+// this whole block is dead-code-eliminated from production bundles —
+// `window.game` never ships to players.
+if (import.meta.env.DEV) {
+  window.game = game;
+}
+
+export default game;
